@@ -19,10 +19,134 @@ config BR2_ROOTFS_SKELETON_CUSTOM
 	help
 	  Use custom target skeleton.
 
+config BR2_ROOTFS_SKELETON_UBUNTU_BASE
+	bool "ubuntu base target skeleton"
+	select BR2_PACKAGE_SKELETON_UBUNTU_BASE
+	help
+	  Use ubuntu base target skeleton.
+
+	  Ubuntu Base is a minimal rootfs for use in the creation 
+	  of custom images for specific needs. Ubuntu Base strives 
+	  to create a suitable minimal environment for use in Board 
+	  Support Packages, constrained or integrated environments, 
+	  as the basis for application demonstration images, or 
+	  Linux containers such as LXC or Docker (For OCI/docker 
+	  container images, see also the Ubuntu OCI project).
+
+	  https://wiki.ubuntu.com/Base
+
 # skeleton from br2-external trees, if any
 source "$BR2_BASE_DIR/.br2-external.in.skeleton"
 
 endchoice
+
+if BR2_ROOTFS_SKELETON_UBUNTU_BASE
+
+choice
+	prompt "Ubuntu Base Release"
+
+config BR2_UBUNTU_BASE_ROOTFS_14_04_5
+	bool "14.04.5"
+	help
+	  Ubuntu Base 14.04.5 (Trusty Tahr)
+
+config BR2_UBUNTU_BASE_ROOTFS_14_04_6
+	bool "14.04.6"
+	help
+	  Ubuntu Base 14.04.6 (Trusty Tahr)
+
+config BR2_UBUNTU_BASE_ROOTFS_16_04_6
+	bool "16.04.6"
+	help
+	  Ubuntu Base 16.04.6 LTS (Xenial Xerus)
+
+config BR2_UBUNTU_BASE_ROOTFS_18_04_5
+	bool "18.04.5"
+	help
+	  Ubuntu Base 18.04.5 LTS (Bionic Beaver)
+
+config BR2_UBUNTU_BASE_ROOTFS_20_04_1
+	bool "20.04.1"
+	help
+	  Ubuntu Base 20.04.1 (Focal Fossa)
+
+config BR2_UBUNTU_BASE_ROOTFS_20_04_2
+	bool "20.04.2"
+	help
+	  Ubuntu Base 20.04.2 (Focal Fossa)
+
+config BR2_UBUNTU_BASE_ROOTFS_20_04_3
+	bool "20.04.3"
+	help
+	  Ubuntu Base 20.04.3 (Focal Fossa)
+
+config BR2_UBUNTU_BASE_ROOTFS_20_04_4
+	bool "20.04.4"
+	help
+	  Ubuntu Base 20.04.4 (Focal Fossa)
+
+config BR2_UBUNTU_BASE_ROOTFS_20_04_5
+	bool "20.04.5"
+	help
+	  Ubuntu Base 20.04.5 LTS (Focal Fossa)
+
+config BR2_UBUNTU_BASE_ROOTFS_22_04
+	bool "22.04"
+	help
+	  Ubuntu Base 22.04 (Jammy Jellyfish)
+
+config BR2_UBUNTU_BASE_ROOTFS_22_04_1
+	bool "22.04.1"
+	help
+	  Ubuntu Base 22.04.1 (Jammy Jellyfish)
+
+config BR2_UBUNTU_BASE_ROOTFS_22_04_2
+	bool "22.04.2"
+	help
+	  Ubuntu Base 22.04.2 (Jammy Jellyfish)
+
+config BR2_UBUNTU_BASE_ROOTFS_22_04_3
+	bool "22.04.3"
+	help
+	  Ubuntu Base 22.04.3 (Jammy Jellyfish)
+
+config BR2_UBUNTU_BASE_ROOTFS_22_04_4
+	bool "22.04.4"
+	help
+	  Ubuntu Base 22.04.4 LTS (Jammy Jellyfish)
+
+config BR2_UBUNTU_BASE_ROOTFS_24_04
+	bool "24.04"
+	help
+	  Ubuntu Base 24.04 (Noble Numbat)
+
+endchoice
+
+config BR2_UBUNTU_BASE_RELEASE
+	string
+	default "14.04.5"	if BR2_UBUNTU_BASE_ROOTFS_14_04_5
+	default "14.04.6"	if BR2_UBUNTU_BASE_ROOTFS_14_04_6
+	default "16.04.6"	if BR2_UBUNTU_BASE_ROOTFS_16_04_6
+	default "18.04.5"	if BR2_UBUNTU_BASE_ROOTFS_18_04_5
+	default "20.04.1"	if BR2_UBUNTU_BASE_ROOTFS_20_04_1
+	default "20.04.2"	if BR2_UBUNTU_BASE_ROOTFS_20_04_2
+	default "20.04.3"	if BR2_UBUNTU_BASE_ROOTFS_20_04_3
+	default "20.04.4"	if BR2_UBUNTU_BASE_ROOTFS_20_04_4
+	default "20.04.5"	if BR2_UBUNTU_BASE_ROOTFS_20_04_5
+	default "22.04"	if BR2_UBUNTU_BASE_ROOTFS_22_04
+	default "22.04.1"	if BR2_UBUNTU_BASE_ROOTFS_22_04_1
+	default "22.04.2"	if BR2_UBUNTU_BASE_ROOTFS_22_04_2
+	default "22.04.3"	if BR2_UBUNTU_BASE_ROOTFS_22_04_3
+	default "22.04.4"	if BR2_UBUNTU_BASE_ROOTFS_22_04_4
+	default "24.04"	if BR2_UBUNTU_BASE_ROOTFS_24_04
+
+config BR2_UBUNTU_BASE_ARCH
+	string 
+	default "armhf"		if BR2_arm
+	default "arm64"		if BR2_aarch64
+	default "amd64"		if BR2_x86_64
+
+endif
 
 if BR2_ROOTFS_SKELETON_CUSTOM
 
@@ -47,6 +171,28 @@ config BR2_TARGET_GENERIC_HOSTNAME
 config BR2_TARGET_GENERIC_ISSUE
 	string "System banner"
 	default "Welcome to Buildroot"
+	help
+	  Select system banner (/etc/issue) to be displayed at login.
+
+	  Leave empty to not create /etc/issue, or to keep the
+	  one from a custom skeleton.
+
+endif
+
+if BR2_ROOTFS_SKELETON_UBUNTU_BASE
+
+config BR2_TARGET_GENERIC_HOSTNAME
+	string "System hostname"
+	default "ubuntubase"
+	help
+	  Select system hostname to be stored in /etc/hostname.
+
+	  Leave empty to not create /etc/hostname, or to keep the
+	  one from a custom skeleton.
+
+config BR2_TARGET_GENERIC_ISSUE
+	string "System banner"
+	default "Welcome to Ubuntu Base"
 	help
 	  Select system banner (/etc/issue) to be displayed at login.
 
@@ -308,7 +454,7 @@ config BR2_ROOTFS_MERGED_USR
 	  symlinks to their counterparts in /usr. In this case, /usr can
 	  not be a separate filesystem.
 
-if BR2_ROOTFS_SKELETON_DEFAULT
+if BR2_ROOTFS_SKELETON_DEFAULT || BR2_ROOTFS_SKELETON_UBUNTU_BASE
 
 config BR2_TARGET_ENABLE_ROOT_LOGIN
 	bool "Enable root login with password"

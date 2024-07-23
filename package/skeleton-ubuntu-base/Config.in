@@ -1,0 +1,5 @@
+config BR2_PACKAGE_SKELETON_UBUNTU_BASE
+	bool
+
+config BR2_PACKAGE_PROVIDES_SKELETON
+	default "skeleton-ubuntu-base" if BR2_PACKAGE_SKELETON_UBUNTU_BASE
