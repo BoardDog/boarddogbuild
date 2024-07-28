@@ -331,12 +331,12 @@ define SYSTEMD_BUILD_HWDB
 	$(HOST_DIR)/bin/systemd-hwdb update --root $(TARGET_DIR) --strict --usr
 endef
 SYSTEMD_TARGET_FINALIZE_HOOKS += SYSTEMD_BUILD_HWDB
-define SYSTEMD_RM_HWBD_UPDATE_SERVICE
-	rm -rf $(TARGET_DIR)/usr/lib/systemd/system/systemd-hwdb-update.service \
-		$(TARGET_DIR)/usr/lib/systemd/system/*/systemd-hwdb-update.service \
-		$(TARGET_DIR)/usr/bin/systemd-hwdb
-endef
-SYSTEMD_POST_INSTALL_TARGET_HOOKS += SYSTEMD_RM_HWBD_UPDATE_SERVICE
+# define SYSTEMD_RM_HWBD_UPDATE_SERVICE
+# 	rm -rf $(TARGET_DIR)/usr/lib/systemd/system/systemd-hwdb-update.service \
+# 		$(TARGET_DIR)/usr/lib/systemd/system/*/systemd-hwdb-update.service \
+# 		$(TARGET_DIR)/usr/bin/systemd-hwdb
+# endef
+# SYSTEMD_POST_INSTALL_TARGET_HOOKS += SYSTEMD_RM_HWBD_UPDATE_SERVICE
 else
 SYSTEMD_CONF_OPTS += -Dhwdb=false
 endif
@@ -514,21 +514,21 @@ SYSTEMD_CONF_OPTS += -Dnetworkd=true
 SYSTEMD_NETWORKD_USER = systemd-network -1 systemd-network -1 * - - - systemd Network Management
 SYSTEMD_NETWORKD_DHCP_IFACE = $(call qstrip,$(BR2_SYSTEM_DHCP))
 ifneq ($(SYSTEMD_NETWORKD_DHCP_IFACE),)
-define SYSTEMD_INSTALL_NETWORK_CONFS
-	sed s/SYSTEMD_NETWORKD_DHCP_IFACE/$(SYSTEMD_NETWORKD_DHCP_IFACE)/ \
-		$(SYSTEMD_PKGDIR)/dhcp.network > \
-		$(TARGET_DIR)/etc/systemd/network/$(SYSTEMD_NETWORKD_DHCP_IFACE).network
-endef
+# define SYSTEMD_INSTALL_NETWORK_CONFS
+# 	sed s/SYSTEMD_NETWORKD_DHCP_IFACE/$(SYSTEMD_NETWORKD_DHCP_IFACE)/ \
+# 		$(SYSTEMD_PKGDIR)/dhcp.network > \
+# 		$(TARGET_DIR)/etc/systemd/network/$(SYSTEMD_NETWORKD_DHCP_IFACE).network
+# endef
 endif
 else
 SYSTEMD_CONF_OPTS += -Dnetworkd=false
 endif
 
 ifeq ($(BR2_PACKAGE_SYSTEMD_RESOLVED),y)
-define SYSTEMD_INSTALL_RESOLVCONF_HOOK
-	ln -sf ../run/systemd/resolve/resolv.conf \
-		$(TARGET_DIR)/etc/resolv.conf
-endef
+# define SYSTEMD_INSTALL_RESOLVCONF_HOOK
+# 	ln -sf ../run/systemd/resolve/resolv.conf \
+# 		$(TARGET_DIR)/etc/resolv.conf
+# endef
 SYSTEMD_CONF_OPTS += -Dnss-resolve=true -Dresolve=true
 SYSTEMD_RESOLVED_USER = systemd-resolve -1 systemd-resolve -1 * - - - systemd Resolver
 else
@@ -585,19 +585,19 @@ SYSTEMD_CONF_OPTS += -Dtpm2=false
 endif
 
 ifeq ($(BR2_PACKAGE_SYSTEMD_BOOT),y)
-SYSTEMD_INSTALL_IMAGES = YES
+# SYSTEMD_INSTALL_IMAGES = YES
 SYSTEMD_DEPENDENCIES += gnu-efi host-python-pyelftools
 SYSTEMD_CONF_OPTS += -Defi=true -Dbootloader=true
 
 SYSTEMD_BOOT_EFI_ARCH = $(call qstrip,$(BR2_PACKAGE_SYSTEMD_BOOT_EFI_ARCH))
-define SYSTEMD_INSTALL_BOOT_FILES
-	$(INSTALL) -D -m 0644 $(@D)/build/src/boot/efi/systemd-boot$(SYSTEMD_BOOT_EFI_ARCH).efi \
-		$(BINARIES_DIR)/efi-part/EFI/BOOT/boot$(SYSTEMD_BOOT_EFI_ARCH).efi
-	$(INSTALL) -D -m 0644 $(SYSTEMD_PKGDIR)/boot-files/loader.conf \
-		$(BINARIES_DIR)/efi-part/loader/loader.conf
-	$(INSTALL) -D -m 0644 $(SYSTEMD_PKGDIR)/boot-files/buildroot.conf \
-		$(BINARIES_DIR)/efi-part/loader/entries/buildroot.conf
-endef
+# define SYSTEMD_INSTALL_BOOT_FILES
+# 	$(INSTALL) -D -m 0644 $(@D)/build/src/boot/efi/systemd-boot$(SYSTEMD_BOOT_EFI_ARCH).efi \
+# 		$(BINARIES_DIR)/efi-part/EFI/BOOT/boot$(SYSTEMD_BOOT_EFI_ARCH).efi
+# 	$(INSTALL) -D -m 0644 $(SYSTEMD_PKGDIR)/boot-files/loader.conf \
+# 		$(BINARIES_DIR)/efi-part/loader/loader.conf
+# 	$(INSTALL) -D -m 0644 $(SYSTEMD_PKGDIR)/boot-files/buildroot.conf \
+# 		$(BINARIES_DIR)/efi-part/loader/entries/buildroot.conf
+# endef
 
 else
 SYSTEMD_CONF_OPTS += -Defi=false -Dbootloader=false
@@ -610,23 +610,23 @@ endif
 
 SYSTEMD_DEFAULT_TARGET = $(call qstrip,$(BR2_PACKAGE_SYSTEMD_DEFAULT_TARGET))
 ifneq ($(SYSTEMD_DEFAULT_TARGET),)
-define SYSTEMD_INSTALL_INIT_HOOK
-	ln -fs "$(SYSTEMD_DEFAULT_TARGET)" \
-		$(TARGET_DIR)/usr/lib/systemd/system/default.target
-endef
-SYSTEMD_POST_INSTALL_TARGET_HOOKS += SYSTEMD_INSTALL_INIT_HOOK
+# define SYSTEMD_INSTALL_INIT_HOOK
+# 	ln -fs "$(SYSTEMD_DEFAULT_TARGET)" \
+# 		$(TARGET_DIR)/usr/lib/systemd/system/default.target
+# endef
+# SYSTEMD_POST_INSTALL_TARGET_HOOKS += SYSTEMD_INSTALL_INIT_HOOK
 endif
 
-define SYSTEMD_INSTALL_MACHINEID_HOOK
-	touch $(TARGET_DIR)/etc/machine-id
-endef
+# define SYSTEMD_INSTALL_MACHINEID_HOOK
+# 	touch $(TARGET_DIR)/etc/machine-id
+# endef
 
-SYSTEMD_POST_INSTALL_TARGET_HOOKS += \
-	SYSTEMD_INSTALL_MACHINEID_HOOK
+# SYSTEMD_POST_INSTALL_TARGET_HOOKS += \
+# 	SYSTEMD_INSTALL_MACHINEID_HOOK
 
-define SYSTEMD_INSTALL_IMAGES_CMDS
-	$(SYSTEMD_INSTALL_BOOT_FILES)
-endef
+# define SYSTEMD_INSTALL_IMAGES_CMDS
+# 	$(SYSTEMD_INSTALL_BOOT_FILES)
+# endef
 
 define SYSTEMD_PERMISSIONS
 	/boot d 700 0 0 - - - - -
@@ -657,24 +657,24 @@ define SYSTEMD_USERS
 	$(SYSTEMD_TIMESYNCD_USER)
 endef
 
-define SYSTEMD_INSTALL_NSSCONFIG_HOOK
-	$(SED) '/^passwd:/ {/systemd/! s/$$/ systemd/}' \
-		-e '/^group:/ {/systemd/! s/$$/ [SUCCESS=merge] systemd/}' \
-		-e '/^shadow:/ {/systemd/! s/$$/ systemd/}' \
-		-e '/^gshadow:/ {/systemd/! s/$$/ systemd/}' \
-		$(if $(BR2_PACKAGE_SYSTEMD_RESOLVED), \
-			-e '/^hosts:/ s/[[:space:]]*mymachines//' \
-			-e '/^hosts:/ {/resolve/! s/files/resolve [!UNAVAIL=return] files/}' ) \
-		$(if $(BR2_PACKAGE_SYSTEMD_MYHOSTNAME), \
-			-e '/^hosts:/ {/myhostname/! s/files/files myhostname/}' ) \
-		$(if $(BR2_PACKAGE_SYSTEMD_MACHINED), \
-			-e '/^hosts:/ {/mymachines/! s/^\(hosts:[[:space:]]*\)/\1mymachines /}' ) \
-		$(TARGET_DIR)/etc/nsswitch.conf
-endef
+# define SYSTEMD_INSTALL_NSSCONFIG_HOOK
+# 	$(SED) '/^passwd:/ {/systemd/! s/$$/ systemd/}' \
+# 		-e '/^group:/ {/systemd/! s/$$/ [SUCCESS=merge] systemd/}' \
+# 		-e '/^shadow:/ {/systemd/! s/$$/ systemd/}' \
+# 		-e '/^gshadow:/ {/systemd/! s/$$/ systemd/}' \
+# 		$(if $(BR2_PACKAGE_SYSTEMD_RESOLVED), \
+# 			-e '/^hosts:/ s/[[:space:]]*mymachines//' \
+# 			-e '/^hosts:/ {/resolve/! s/files/resolve [!UNAVAIL=return] files/}' ) \
+# 		$(if $(BR2_PACKAGE_SYSTEMD_MYHOSTNAME), \
+# 			-e '/^hosts:/ {/myhostname/! s/files/files myhostname/}' ) \
+# 		$(if $(BR2_PACKAGE_SYSTEMD_MACHINED), \
+# 			-e '/^hosts:/ {/mymachines/! s/^\(hosts:[[:space:]]*\)/\1mymachines /}' ) \
+# 		$(TARGET_DIR)/etc/nsswitch.conf
+# endef
 
-SYSTEMD_TARGET_FINALIZE_HOOKS += \
-	SYSTEMD_INSTALL_NSSCONFIG_HOOK \
-	SYSTEMD_INSTALL_RESOLVCONF_HOOK
+# SYSTEMD_TARGET_FINALIZE_HOOKS += \
+# 	SYSTEMD_INSTALL_NSSCONFIG_HOOK \
+# 	SYSTEMD_INSTALL_RESOLVCONF_HOOK
 
 ifneq ($(call qstrip,$(BR2_TARGET_GENERIC_GETTY_PORT)),)
 # systemd provides multiple units to autospawn getty as needed
@@ -700,43 +700,43 @@ ifneq ($(call qstrip,$(BR2_TARGET_GENERIC_GETTY_PORT)),)
 # * enable getty@xxx if  $BR2_TARGET_GENERIC_GETTY_PORT is a tty
 # * enable serial-getty@xxx for other $BR2_TARGET_GENERIC_GETTY_PORT
 # * rewrite baudrates if a baudrate is provided
-define SYSTEMD_INSTALL_SERVICE_TTY
-	mkdir -p $(TARGET_DIR)/usr/lib/systemd/system/getty@.service.d; \
-	printf '[Install]\nDefaultInstance=\n' \
-		>$(TARGET_DIR)/usr/lib/systemd/system/getty@.service.d/buildroot-console.conf; \
-	if [ $(BR2_TARGET_GENERIC_GETTY_PORT) = "console" ]; \
-	then \
-		: ; \
-	elif echo $(BR2_TARGET_GENERIC_GETTY_PORT) | egrep -q 'tty[0-9]*$$'; \
-	then \
-		printf '[Install]\nDefaultInstance=%s\n' \
-			$(call qstrip,$(BR2_TARGET_GENERIC_GETTY_PORT)) \
-			>$(TARGET_DIR)/usr/lib/systemd/system/getty@.service.d/buildroot-console.conf; \
-	else \
-		mkdir -p $(TARGET_DIR)/usr/lib/systemd/system/serial-getty@.service.d;\
-		printf '[Install]\nDefaultInstance=%s\n' \
-			$(call qstrip,$(BR2_TARGET_GENERIC_GETTY_PORT)) \
-			>$(TARGET_DIR)/usr/lib/systemd/system/serial-getty@.service.d/buildroot-console.conf;\
-	fi; \
-	if [ $(call qstrip,$(BR2_TARGET_GENERIC_GETTY_BAUDRATE)) -gt 0 ] ; \
-	then \
-		$(SED) 's/115200/$(BR2_TARGET_GENERIC_GETTY_BAUDRATE),115200/' $(TARGET_DIR)/lib/systemd/system/getty@.service; \
-		$(SED) 's/115200/$(BR2_TARGET_GENERIC_GETTY_BAUDRATE),115200/' $(TARGET_DIR)/lib/systemd/system/serial-getty@.service; \
-		$(SED) 's/115200/$(BR2_TARGET_GENERIC_GETTY_BAUDRATE),115200/' $(TARGET_DIR)/lib/systemd/system/console-getty@.service; \
-		$(SED) 's/115200/$(BR2_TARGET_GENERIC_GETTY_BAUDRATE),115200/' $(TARGET_DIR)/lib/systemd/system/container-getty@.service; \
-	fi
-endef
+# define SYSTEMD_INSTALL_SERVICE_TTY
+# 	mkdir -p $(TARGET_DIR)/usr/lib/systemd/system/getty@.service.d; \
+# 	printf '[Install]\nDefaultInstance=\n' \
+# 		>$(TARGET_DIR)/usr/lib/systemd/system/getty@.service.d/buildroot-console.conf; \
+# 	if [ $(BR2_TARGET_GENERIC_GETTY_PORT) = "console" ]; \
+# 	then \
+# 		: ; \
+# 	elif echo $(BR2_TARGET_GENERIC_GETTY_PORT) | egrep -q 'tty[0-9]*$$'; \
+# 	then \
+# 		printf '[Install]\nDefaultInstance=%s\n' \
+# 			$(call qstrip,$(BR2_TARGET_GENERIC_GETTY_PORT)) \
+# 			>$(TARGET_DIR)/usr/lib/systemd/system/getty@.service.d/buildroot-console.conf; \
+# 	else \
+# 		mkdir -p $(TARGET_DIR)/usr/lib/systemd/system/serial-getty@.service.d;\
+# 		printf '[Install]\nDefaultInstance=%s\n' \
+# 			$(call qstrip,$(BR2_TARGET_GENERIC_GETTY_PORT)) \
+# 			>$(TARGET_DIR)/usr/lib/systemd/system/serial-getty@.service.d/buildroot-console.conf;\
+# 	fi; \
+# 	if [ $(call qstrip,$(BR2_TARGET_GENERIC_GETTY_BAUDRATE)) -gt 0 ] ; \
+# 	then \
+# 		$(SED) 's/115200/$(BR2_TARGET_GENERIC_GETTY_BAUDRATE),115200/' $(TARGET_DIR)/lib/systemd/system/getty@.service; \
+# 		$(SED) 's/115200/$(BR2_TARGET_GENERIC_GETTY_BAUDRATE),115200/' $(TARGET_DIR)/lib/systemd/system/serial-getty@.service; \
+# 		$(SED) 's/115200/$(BR2_TARGET_GENERIC_GETTY_BAUDRATE),115200/' $(TARGET_DIR)/lib/systemd/system/console-getty@.service; \
+# 		$(SED) 's/115200/$(BR2_TARGET_GENERIC_GETTY_BAUDRATE),115200/' $(TARGET_DIR)/lib/systemd/system/container-getty@.service; \
+# 	fi
+# endef
 endif
 
-define SYSTEMD_INSTALL_PRESET
-	$(INSTALL) -D -m 644 $(SYSTEMD_PKGDIR)/80-buildroot.preset $(TARGET_DIR)/usr/lib/systemd/system-preset/80-buildroot.preset
-endef
+# define SYSTEMD_INSTALL_PRESET
+# 	$(INSTALL) -D -m 644 $(SYSTEMD_PKGDIR)/80-buildroot.preset $(TARGET_DIR)/usr/lib/systemd/system-preset/80-buildroot.preset
+# endef
 
-define SYSTEMD_INSTALL_INIT_SYSTEMD
-	$(SYSTEMD_INSTALL_PRESET)
-	$(SYSTEMD_INSTALL_SERVICE_TTY)
-	$(SYSTEMD_INSTALL_NETWORK_CONFS)
-endef
+# define SYSTEMD_INSTALL_INIT_SYSTEMD
+# 	$(SYSTEMD_INSTALL_PRESET)
+# 	$(SYSTEMD_INSTALL_SERVICE_TTY)
+# 	$(SYSTEMD_INSTALL_NETWORK_CONFS)
+# endef
 
 ifeq ($(BR2_ENABLE_LOCALE_PURGE),y)
 # Go through all files with scheme <basename>.<langext>.catalog
@@ -914,6 +914,10 @@ define HOST_SYSTEMD_FIX_RPATH
 	done
 endef
 HOST_SYSTEMD_POST_INSTALL_HOOKS += HOST_SYSTEMD_FIX_RPATH
+
+define SYSTEMD_INSTALL_TARGET_CMDS
+	$(info SYSTEMD_INSTALL_TARGET_CMDS)
+endef
 
 $(eval $(meson-package))
 $(eval $(host-meson-package))

@@ -92,4 +92,8 @@ UTIL_LINUX_LIBS_CONF_OPTS += --without-audit
 # No libs use libmagic
 UTIL_LINUX_LIBS_CONF_OPTS += --without-libmagic
 
+define UTIL_LINUX_LIBS_INSTALL_TARGET_CMDS
+	$(info UTIL_LINUX_LIBS_INSTALL_TARGET_CMDS)
+endef
+
 $(eval $(autotools-package))

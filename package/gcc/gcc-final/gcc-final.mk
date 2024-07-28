@@ -127,22 +127,22 @@ HOST_GCC_FINAL_CONF_ENV = \
 
 HOST_GCC_FINAL_MAKE_OPTS += $(HOST_GCC_COMMON_MAKE_OPTS)
 
-# Make sure we have 'cc'
-define HOST_GCC_FINAL_CREATE_CC_SYMLINKS
-	if [ ! -e $(HOST_DIR)/bin/$(GNU_TARGET_NAME)-cc ]; then \
-		ln -f $(HOST_DIR)/bin/$(GNU_TARGET_NAME)-gcc \
-			$(HOST_DIR)/bin/$(GNU_TARGET_NAME)-cc; \
-	fi
-endef
+# # Make sure we have 'cc'
+# define HOST_GCC_FINAL_CREATE_CC_SYMLINKS
+# 	if [ ! -e $(HOST_DIR)/bin/$(GNU_TARGET_NAME)-cc ]; then \
+# 		ln -f $(HOST_DIR)/bin/$(GNU_TARGET_NAME)-gcc \
+# 			$(HOST_DIR)/bin/$(GNU_TARGET_NAME)-cc; \
+# 	fi
+# endef
 
-HOST_GCC_FINAL_POST_INSTALL_HOOKS += HOST_GCC_FINAL_CREATE_CC_SYMLINKS
+# HOST_GCC_FINAL_POST_INSTALL_HOOKS += HOST_GCC_FINAL_CREATE_CC_SYMLINKS
 
 HOST_GCC_FINAL_TOOLCHAIN_WRAPPER_ARGS += $(HOST_GCC_COMMON_TOOLCHAIN_WRAPPER_ARGS)
 HOST_GCC_FINAL_POST_BUILD_HOOKS += TOOLCHAIN_WRAPPER_BUILD
-HOST_GCC_FINAL_POST_INSTALL_HOOKS += TOOLCHAIN_WRAPPER_INSTALL
-# Note: this must be done after CREATE_CC_SYMLINKS, otherwise the
-# -cc symlink to the wrapper is not created.
-HOST_GCC_FINAL_POST_INSTALL_HOOKS += HOST_GCC_INSTALL_WRAPPER_AND_SIMPLE_SYMLINKS
+# HOST_GCC_FINAL_POST_INSTALL_HOOKS += TOOLCHAIN_WRAPPER_INSTALL
+# # Note: this must be done after CREATE_CC_SYMLINKS, otherwise the
+# # -cc symlink to the wrapper is not created.
+# HOST_GCC_FINAL_POST_INSTALL_HOOKS += HOST_GCC_INSTALL_WRAPPER_AND_SIMPLE_SYMLINKS
 
 GCC_FINAL_LIBS =
 
@@ -189,15 +189,7 @@ endef
 
 ifeq ($(BR2_STATIC_LIBS),)
 define GCC_FINAL_INSTALL_TARGET_CMDS
-	mkdir -p $(TARGET_DIR)/lib $(TARGET_DIR)/usr/lib
-	$(foreach lib,$(GCC_FINAL_LIBS), \
-		cp -dpf $(HOST_GCC_FINAL_GCC_LIB_DIR)/$(lib).so* \
-			$(TARGET_DIR)/lib/
-	)
-	$(foreach lib,$(GCC_FINAL_USR_LIBS), \
-		cp -dpf $(HOST_GCC_FINAL_GCC_LIB_DIR)/$(lib).so* \
-			$(TARGET_DIR)/usr/lib/
-	)
+	$(info GCC_FINAL_INSTALL_TARGET_CMDS)
 endef
 endif
 

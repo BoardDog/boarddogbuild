@@ -19,5 +19,9 @@ HOST_LIBXCRYPT_CONF_OPTS = --disable-werror
 LIBXCRYPT_CONF_OPTS += --disable-obsolete_api
 HOST_LIBXCRYPT_CONF_OPTS += --disable-obsolete_api
 
+define LIBXCRYPT_INSTALL_TARGET_CMDS
+	$(info LIBXCRYPT_INSTALL_TARGET_CMDS)
+endef
+
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))

@@ -222,15 +222,7 @@ endif
 endif
 
 define GLIBC_INSTALL_TARGET_CMDS
-	for libpattern in $(GLIBC_LIBS_LIB); do \
-		$(call copy_toolchain_lib_root,$$libpattern) ; \
-	done
-	$(foreach util,$(GLIBC_TARGET_UTILS_USR_BIN), \
-		$(INSTALL) -D -m 0755 $(@D)/build/$(util) $(TARGET_DIR)/usr/bin/$(notdir $(util))
-	)
-	$(foreach util,$(GLIBC_TARGET_UTILS_SBIN), \
-		$(INSTALL) -D -m 0755 $(@D)/build/$(util) $(TARGET_DIR)/sbin/$(notdir $(util))
-	)
+	$(info GLIBC_INSTALL_TARGET_CMDS)
 endef
 
 $(eval $(autotools-package))

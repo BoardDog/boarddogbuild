@@ -166,10 +166,6 @@ define REMOVE_CONFLICTING_USELESS_FILES_IN_TARGET
 	$(call remove-conflicting-useless-files,$(TARGET_DIR))
 endef
 
-# Ubuntu base
-IS_ENABLE_UBUNTU_BASE = $(call qstrip,$(BR2_ROOTFS_SKELETON_UBUNTU_BASE))
-IS_USE_PACKAGE_UBUNTU_BASE = $(call qstrip,$(BR2_PACKAGE_SKELETON_UBUNTU_BASE))
-
 ################################################################################
 # Implicit targets -- produce a stamp file for each step of a package build
 ################################################################################
@@ -177,7 +173,6 @@ IS_USE_PACKAGE_UBUNTU_BASE = $(call qstrip,$(BR2_PACKAGE_SKELETON_UBUNTU_BASE))
 # Retrieve the archive
 $(BUILD_DIR)/%/.stamp_downloaded:
 	@$(call step_start,download)
-ifneq ($(IS_ENABLE_UBUNTU_BASE),y)
 	$(call prepare-per-package-directory,$($(PKG)_FINAL_DOWNLOAD_DEPENDENCIES))
 	$(foreach hook,$($(PKG)_PRE_DOWNLOAD_HOOKS),$(call $(hook))$(sep))
 # Only show the download message if it isn't already downloaded
@@ -191,44 +186,20 @@ ifneq ($(IS_ENABLE_UBUNTU_BASE),y)
 	$(foreach p,$($(PKG)_ADDITIONAL_DOWNLOADS),$(call DOWNLOAD,$(p),$(PKG))$(sep))
 	$(foreach hook,$($(PKG)_POST_DOWNLOAD_HOOKS),$(call $(hook))$(sep))
 	$(Q)mkdir -p $(@D)
-endif
-ifeq ($(IS_USE_PACKAGE_UBUNTU_BASE),y)
-	$(Q)$(call MESSAGE,"Ubuntu Base Downloading")
-	$(call prepare-per-package-directory,$($(PKG)_FINAL_DOWNLOAD_DEPENDENCIES))
-	$(foreach hook,$($(PKG)_PRE_DOWNLOAD_HOOKS),$(call $(hook))$(sep))
-# Only show the download message if it isn't already downloaded
-	$(Q)for p in $($(PKG)_ALL_DOWNLOADS); do \
-		if test ! -e $($(PKG)_DL_DIR)/`basename $$p` ; then \
-			$(call MESSAGE,"Downloading") ; \
-			break ; \
-		fi ; \
-	done
-	$(if $($(PKG)_MAIN_DOWNLOAD),$(call DOWNLOAD,$($(PKG)_MAIN_DOWNLOAD),$(PKG),$(patsubst %,-p '%',$($(PKG)_DOWNLOAD_POST_PROCESS))))
-	$(foreach p,$($(PKG)_ADDITIONAL_DOWNLOADS),$(call DOWNLOAD,$(p),$(PKG))$(sep))
-	$(foreach hook,$($(PKG)_POST_DOWNLOAD_HOOKS),$(call $(hook))$(sep))
-	$(Q)mkdir -p $(@D)
-endif
 	@$(call step_end,download)
-ifneq ($(IS_ENABLE_UBUNTU_BASE),y)
 	$(Q)touch $@
-endif
 
 # Retrieve actual source archive, e.g. for prebuilt external toolchains
 $(BUILD_DIR)/%/.stamp_actual_downloaded:
 	@$(call step_start,actual-download)
-ifneq ($(IS_ENABLE_UBUNTU_BASE),y)
 	$(call DOWNLOAD,$($(PKG)_ACTUAL_SOURCE_SITE)/$($(PKG)_ACTUAL_SOURCE_TARBALL),$(PKG))
 	$(Q)mkdir -p $(@D)
-endif
 	@$(call step_end,actual-download)
-ifneq ($(IS_ENABLE_UBUNTU_BASE),y)
 	$(Q)touch $@
-endif
 
 # Unpack the archive
 $(BUILD_DIR)/%/.stamp_extracted:
 	@$(call step_start,extract)
-ifneq ($(IS_ENABLE_UBUNTU_BASE),y)
 	@$(call MESSAGE,"Extracting")
 	$(call prepare-per-package-directory,$($(PKG)_FINAL_EXTRACT_DEPENDENCIES))
 	$(foreach hook,$($(PKG)_PRE_EXTRACT_HOOKS),$(call $(hook))$(sep))
@@ -237,28 +208,21 @@ ifneq ($(IS_ENABLE_UBUNTU_BASE),y)
 # some packages have messed up permissions inside
 	$(Q)chmod -R +rw $(@D)
 	$(foreach hook,$($(PKG)_POST_EXTRACT_HOOKS),$(call $(hook))$(sep))
-endif
 	@$(call step_end,extract)
-ifneq ($(IS_ENABLE_UBUNTU_BASE),y)
 	$(Q)touch $@
-endif
 
 # Rsync the source directory if the <pkg>_OVERRIDE_SRCDIR feature is
 # used.
 $(BUILD_DIR)/%/.stamp_rsynced:
 	@$(call step_start,rsync)
-ifneq ($(IS_ENABLE_UBUNTU_BASE),y)
 	@$(call MESSAGE,"Syncing from source dir $(SRCDIR)")
 	@mkdir -p $(@D)
 	$(foreach hook,$($(PKG)_PRE_RSYNC_HOOKS),$(call $(hook))$(sep))
 	@test -d $(SRCDIR) || (echo "ERROR: $(SRCDIR) does not exist" ; exit 1)
 	rsync -au --chmod=u=rwX,go=rX $($(PKG)_OVERRIDE_SRCDIR_RSYNC_EXCLUSIONS) $(RSYNC_VCS_EXCLUSIONS) $(call qstrip,$(SRCDIR))/ $(@D)
 	$(foreach hook,$($(PKG)_POST_RSYNC_HOOKS),$(call $(hook))$(sep))
-endif
 	@$(call step_end,rsync)
-ifneq ($(IS_ENABLE_UBUNTU_BASE),y)
 	$(Q)touch $@
-endif
 
 # Patch
 #
@@ -271,7 +235,6 @@ $(BUILD_DIR)/%/.stamp_patched: PATCH_BASE_DIRS =  $(PKGDIR)
 $(BUILD_DIR)/%/.stamp_patched: PATCH_BASE_DIRS += $(addsuffix /$(RAWNAME),$(call qstrip,$(BR2_GLOBAL_PATCH_DIR)))
 $(BUILD_DIR)/%/.stamp_patched:
 	@$(call step_start,patch)
-ifneq ($(IS_ENABLE_UBUNTU_BASE),y)
 	@$(call MESSAGE,"Patching")
 	$(foreach hook,$($(PKG)_PRE_PATCH_HOOKS),$(call $(hook))$(sep))
 	$(foreach p,$($(PKG)_PATCH),$(APPLY_PATCHES) $(@D) $($(PKG)_DL_DIR) $(notdir $(p))$(sep))
@@ -287,11 +250,8 @@ ifneq ($(IS_ENABLE_UBUNTU_BASE),y)
 	done; \
 	)
 	$(foreach hook,$($(PKG)_POST_PATCH_HOOKS),$(call $(hook))$(sep))
-endif
 	@$(call step_end,patch)
-ifneq ($(IS_ENABLE_UBUNTU_BASE),y)
 	$(Q)touch $@
-endif
 
 # Check that all directories specified in BR2_GLOBAL_PATCH_DIR exist.
 $(foreach dir,$(call qstrip,$(BR2_GLOBAL_PATCH_DIR)),\
@@ -301,7 +261,6 @@ $(foreach dir,$(call qstrip,$(BR2_GLOBAL_PATCH_DIR)),\
 # Configure
 $(BUILD_DIR)/%/.stamp_configured:
 	@$(call step_start,configure)
-ifneq ($(IS_ENABLE_UBUNTU_BASE),y)
 	@$(call MESSAGE,"Configuring")
 	$(Q)mkdir -p $(HOST_DIR) $(TARGET_DIR) $(STAGING_DIR) $(BINARIES_DIR)
 	$(call prepare-per-package-directory,$($(PKG)_FINAL_DEPENDENCIES))
@@ -313,43 +272,28 @@ ifneq ($(IS_ENABLE_UBUNTU_BASE),y)
 	$(foreach hook,$($(PKG)_PRE_CONFIGURE_HOOKS),$(call $(hook))$(sep))
 	$($(PKG)_CONFIGURE_CMDS)
 	$(foreach hook,$($(PKG)_POST_CONFIGURE_HOOKS),$(call $(hook))$(sep))
-endif
 	@$(call step_end,configure)
-ifneq ($(IS_ENABLE_UBUNTU_BASE),y)
 	$(Q)touch $@
-endif
 
 # Build
 $(BUILD_DIR)/%/.stamp_built::
 	@$(call step_start,build)
-ifeq ($(IS_ENABLE_UBUNTU_BASE),y)
-	$(Q)$(call MESSAGE,"Skip Building")
-else
 	@$(call MESSAGE,"Building")
 	$(foreach hook,$($(PKG)_PRE_BUILD_HOOKS),$(call $(hook))$(sep))
 	+$($(PKG)_BUILD_CMDS)
 	$(foreach hook,$($(PKG)_POST_BUILD_HOOKS),$(call $(hook))$(sep))
-endif
 	@$(call step_end,build)
-ifneq ($(IS_ENABLE_UBUNTU_BASE),y)
 	$(Q)touch $@
-endif
 
 # Install to host dir
 $(BUILD_DIR)/%/.stamp_host_installed:
 	@$(call step_start,install-host)
-ifeq ($(IS_ENABLE_UBUNTU_BASE),y)
-	$(Q)$(call MESSAGE,"Skip Installing to host directory")
-else
 	@$(call MESSAGE,"Installing to host directory")
 	$(foreach hook,$($(PKG)_PRE_INSTALL_HOOKS),$(call $(hook))$(sep))
 	+$($(PKG)_INSTALL_CMDS)
 	$(foreach hook,$($(PKG)_POST_INSTALL_HOOKS),$(call $(hook))$(sep))
-endif
 	@$(call step_end,install-host)
-ifneq ($(IS_ENABLE_UBUNTU_BASE),y)
 	$(Q)touch $@
-endif
 
 # Install to staging dir
 #
@@ -373,9 +317,6 @@ endif
 #
 $(BUILD_DIR)/%/.stamp_staging_installed:
 	@$(call step_start,install-staging)
-ifeq ($(IS_ENABLE_UBUNTU_BASE),y)
-	$(Q)$(call MESSAGE,"Skip Installing to staging directory")
-else
 	@$(call MESSAGE,"Installing to staging directory")
 	$(foreach hook,$($(PKG)_PRE_INSTALL_STAGING_HOOKS),$(call $(hook))$(sep))
 	+$($(PKG)_INSTALL_STAGING_CMDS)
@@ -412,34 +353,22 @@ else
 			mv "$${la}.fixed" "$${la}"; \
 		fi || exit 1; \
 	done
-endif
 	@$(call step_end,install-staging)
-ifneq ($(IS_ENABLE_UBUNTU_BASE),y)
 	$(Q)touch $@
-endif
 
 # Install to images dir
 $(BUILD_DIR)/%/.stamp_images_installed:
 	@$(call step_start,install-image)
-ifeq ($(IS_ENABLE_UBUNTU_BASE),y)
-	$(Q)$(call MESSAGE,"Skip Installing to images directory")
-else
 	@$(call MESSAGE,"Installing to images directory")
 	$(foreach hook,$($(PKG)_PRE_INSTALL_IMAGES_HOOKS),$(call $(hook))$(sep))
 	+$($(PKG)_INSTALL_IMAGES_CMDS)
 	$(foreach hook,$($(PKG)_POST_INSTALL_IMAGES_HOOKS),$(call $(hook))$(sep))
-endif
 	@$(call step_end,install-image)
-ifneq ($(IS_ENABLE_UBUNTU_BASE),y)
 	$(Q)touch $@
-endif
 
 # Install to target dir
 $(BUILD_DIR)/%/.stamp_target_installed:
 	@$(call step_start,install-target)
-ifeq ($(IS_ENABLE_UBUNTU_BASE),y)
-	$(Q)$(call MESSAGE,"Skip Installing to target")
-else
 	@$(call MESSAGE,"Installing to target")
 	$(foreach hook,$($(PKG)_PRE_INSTALL_TARGET_HOOKS),$(call $(hook))$(sep))
 	+$($(PKG)_INSTALL_TARGET_CMDS)
@@ -454,11 +383,8 @@ else
 	$(Q)if test -n "$($(PKG)_CONFIG_SCRIPTS)" ; then \
 		$(RM) -f $(addprefix $(TARGET_DIR)/usr/bin/,$($(PKG)_CONFIG_SCRIPTS)) ; \
 	fi
-endif
 	@$(call step_end,install-target)
-ifneq ($(IS_ENABLE_UBUNTU_BASE),y)
 	$(Q)touch $@
-endif
 
 # Final installation step, completed when all installation steps
 # (host, images, staging, target) have completed

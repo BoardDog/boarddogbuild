@@ -293,27 +293,31 @@ UTIL_LINUX_CONF_OPTS += --without-libmagic
 endif
 
 # Install PAM configuration files
-ifeq ($(BR2_PACKAGE_UTIL_LINUX_SU)$(BR2_PACKAGE_LINUX_PAM),yy)
-define UTIL_LINUX_INSTALL_PAMFILES
-	$(INSTALL) -D -m 0644 package/util-linux/su.pam \
-		$(TARGET_DIR)/etc/pam.d/su
-	$(INSTALL) -D -m 0644 package/util-linux/su.pam \
-		$(TARGET_DIR)/etc/pam.d/su-l
-	$(UTIL_LINUX_SELINUX_PAMFILES_TWEAK)
-endef
-UTIL_LINUX_POST_INSTALL_TARGET_HOOKS += UTIL_LINUX_INSTALL_PAMFILES
-endif
+# ifeq ($(BR2_PACKAGE_UTIL_LINUX_SU)$(BR2_PACKAGE_LINUX_PAM),yy)
+# define UTIL_LINUX_INSTALL_PAMFILES
+# 	$(INSTALL) -D -m 0644 package/util-linux/su.pam \
+# 		$(TARGET_DIR)/etc/pam.d/su
+# 	$(INSTALL) -D -m 0644 package/util-linux/su.pam \
+# 		$(TARGET_DIR)/etc/pam.d/su-l
+# 	$(UTIL_LINUX_SELINUX_PAMFILES_TWEAK)
+# endef
+# UTIL_LINUX_POST_INSTALL_TARGET_HOOKS += UTIL_LINUX_INSTALL_PAMFILES
+# endif
 
 # Install agetty->getty symlink to avoid breakage when there's no busybox
-ifeq ($(BR2_PACKAGE_UTIL_LINUX_AGETTY),y)
-ifeq ($(BR2_PACKAGE_BUSYBOX),)
-define UTIL_LINUX_GETTY_SYMLINK
-	ln -sf agetty $(TARGET_DIR)/sbin/getty
-endef
-endif
-endif
+# ifeq ($(BR2_PACKAGE_UTIL_LINUX_AGETTY),y)
+# ifeq ($(BR2_PACKAGE_BUSYBOX),)
+# define UTIL_LINUX_GETTY_SYMLINK
+# 	ln -sf agetty $(TARGET_DIR)/sbin/getty
+# endef
+# endif
+# endif
 
-UTIL_LINUX_POST_INSTALL_TARGET_HOOKS += UTIL_LINUX_GETTY_SYMLINK
+# UTIL_LINUX_POST_INSTALL_TARGET_HOOKS += UTIL_LINUX_GETTY_SYMLINK
+
+define UTIL_LINUX_INSTALL_TARGET_CMDS
+	$(info UTIL_LINUX_INSTALL_TARGET_CMDS)
+endef
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))

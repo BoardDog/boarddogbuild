@@ -17,5 +17,9 @@ EXPAT_CONF_OPTS = \
 	--without-docbook --without-examples --without-tests --without-xmlwf
 HOST_EXPAT_CONF_OPTS = --without-docbook --without-examples --without-tests
 
+define EXPAT_INSTALL_TARGET_CMDS
+	$(info EXPAT_INSTALL_TARGET_CMDS)
+endef
+
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))
