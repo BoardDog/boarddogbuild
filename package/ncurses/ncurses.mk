@@ -133,21 +133,21 @@ define NCURSES_BUILD_CMDS
 	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D) DESTDIR=$(STAGING_DIR)
 endef
 
-ifeq ($(BR2_PACKAGE_NCURSES_TARGET_PROGS),y)
-define NCURSES_TARGET_SYMLINK_RESET
-	ln -sf tset $(TARGET_DIR)/usr/bin/reset
-endef
-NCURSES_POST_INSTALL_TARGET_HOOKS += NCURSES_TARGET_SYMLINK_RESET
-endif
+# ifeq ($(BR2_PACKAGE_NCURSES_TARGET_PROGS),y)
+# define NCURSES_TARGET_SYMLINK_RESET
+# 	ln -sf tset $(TARGET_DIR)/usr/bin/reset
+# endef
+# NCURSES_POST_INSTALL_TARGET_HOOKS += NCURSES_TARGET_SYMLINK_RESET
+# endif
 
-define NCURSES_TARGET_CLEANUP_TERMINFO
-	$(RM) -rf $(TARGET_DIR)/usr/share/terminfo $(TARGET_DIR)/usr/share/tabset
-	$(foreach t,$(NCURSES_TERMINFO_FILES), \
-		$(INSTALL) -D -m 0644 $(STAGING_DIR)/usr/share/terminfo/$(t) \
-			$(TARGET_DIR)/usr/share/terminfo/$(t)
-	)
-endef
-NCURSES_POST_INSTALL_TARGET_HOOKS += NCURSES_TARGET_CLEANUP_TERMINFO
+# define NCURSES_TARGET_CLEANUP_TERMINFO
+# 	$(RM) -rf $(TARGET_DIR)/usr/share/terminfo $(TARGET_DIR)/usr/share/tabset
+# 	$(foreach t,$(NCURSES_TERMINFO_FILES), \
+# 		$(INSTALL) -D -m 0644 $(STAGING_DIR)/usr/share/terminfo/$(t) \
+# 			$(TARGET_DIR)/usr/share/terminfo/$(t)
+# 	)
+# endef
+# NCURSES_POST_INSTALL_TARGET_HOOKS += NCURSES_TARGET_CLEANUP_TERMINFO
 
 HOST_NCURSES_CONF_ENV = \
 	ac_cv_path_LDCONFIG=""
@@ -162,6 +162,10 @@ HOST_NCURSES_CONF_OPTS = \
 	--with-default-terminfo-dir=/usr/share/terminfo \
 	--disable-db-install \
 	--without-normal
+
+define NCURSES_INSTALL_TARGET_CMDS
+	$(info NCURSES_INSTALL_TARGET_CMDS)
+endef
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))

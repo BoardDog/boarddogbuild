@@ -82,41 +82,41 @@ define DBUS_REMOVE_VAR_LIB_DBUS
 	rm -rf $(TARGET_DIR)/var/lib/dbus
 endef
 
-DBUS_PRE_INSTALL_TARGET_HOOKS += DBUS_REMOVE_VAR_LIB_DBUS
+# DBUS_PRE_INSTALL_TARGET_HOOKS += DBUS_REMOVE_VAR_LIB_DBUS
 
-define DBUS_REMOVE_DEVFILES
-	rm -rf $(TARGET_DIR)/usr/lib/dbus-1.0
-endef
+# define DBUS_REMOVE_DEVFILES
+# 	rm -rf $(TARGET_DIR)/usr/lib/dbus-1.0
+# endef
 
-DBUS_POST_INSTALL_TARGET_HOOKS += DBUS_REMOVE_DEVFILES
+# DBUS_POST_INSTALL_TARGET_HOOKS += DBUS_REMOVE_DEVFILES
 
-define DBUS_INSTALL_INIT_SYSV
-	$(INSTALL) -m 0755 -D package/dbus/S30dbus \
-		$(TARGET_DIR)/etc/init.d/S30dbus
+# define DBUS_INSTALL_INIT_SYSV
+# 	$(INSTALL) -m 0755 -D package/dbus/S30dbus \
+# 		$(TARGET_DIR)/etc/init.d/S30dbus
 
-	mkdir -p $(TARGET_DIR)/var/lib
-	rm -rf $(TARGET_DIR)/var/lib/dbus
-	ln -sf /tmp/dbus $(TARGET_DIR)/var/lib/dbus
-endef
+# 	mkdir -p $(TARGET_DIR)/var/lib
+# 	rm -rf $(TARGET_DIR)/var/lib/dbus
+# 	ln -sf /tmp/dbus $(TARGET_DIR)/var/lib/dbus
+# endef
 
 # If dbus-broker is installed, don't install the activation links for
 # dbus itself, not the configuration files. They will be overwritten
 # by dbus-broker
-ifeq ($(BR2_PACKAGE_DBUS_BROKER),y)
-define DBUS_REMOVE_SYSTEMD_ACTIVATION_LINKS
-	rm -f $(TARGET_DIR)/usr/lib/systemd/system/multi-user.target.wants/dbus.service
-	rm -f $(TARGET_DIR)/usr/lib/systemd/system/sockets.target.wants/dbus.socket
-	rm -f $(TARGET_DIR)/usr/lib/systemd/system/dbus.socket
-	rm -f $(TARGET_DIR)/usr/share/dbus-1/session.conf
-	rm -f $(TARGET_DIR)/usr/share/dbus-1/system.conf
-endef
-DBUS_POST_INSTALL_TARGET_HOOKS += DBUS_REMOVE_SYSTEMD_ACTIVATION_LINKS
-endif
+# ifeq ($(BR2_PACKAGE_DBUS_BROKER),y)
+# define DBUS_REMOVE_SYSTEMD_ACTIVATION_LINKS
+# 	rm -f $(TARGET_DIR)/usr/lib/systemd/system/multi-user.target.wants/dbus.service
+# 	rm -f $(TARGET_DIR)/usr/lib/systemd/system/sockets.target.wants/dbus.socket
+# 	rm -f $(TARGET_DIR)/usr/lib/systemd/system/dbus.socket
+# 	rm -f $(TARGET_DIR)/usr/share/dbus-1/session.conf
+# 	rm -f $(TARGET_DIR)/usr/share/dbus-1/system.conf
+# endef
+# DBUS_POST_INSTALL_TARGET_HOOKS += DBUS_REMOVE_SYSTEMD_ACTIVATION_LINKS
+# endif
 
-define DBUS_INSTALL_INIT_SYSTEMD
-	mkdir -p $(TARGET_DIR)/var/lib/dbus
-	ln -sf /etc/machine-id $(TARGET_DIR)/var/lib/dbus/machine-id
-endef
+# define DBUS_INSTALL_INIT_SYSTEMD
+# 	mkdir -p $(TARGET_DIR)/var/lib/dbus
+# 	ln -sf /etc/machine-id $(TARGET_DIR)/var/lib/dbus/machine-id
+# endef
 
 HOST_DBUS_DEPENDENCIES = host-pkgconf host-expat
 HOST_DBUS_CONF_OPTS = \
@@ -132,10 +132,14 @@ HOST_DBUS_CONF_OPTS = \
 # dbus for the host
 DBUS_HOST_INTROSPECT = $(HOST_DBUS_DIR)/introspect.xml
 
-HOST_DBUS_GEN_INTROSPECT = \
-	$(HOST_DIR)/bin/dbus-daemon --introspect > $(DBUS_HOST_INTROSPECT)
+# HOST_DBUS_GEN_INTROSPECT = \
+# 	$(HOST_DIR)/bin/dbus-daemon --introspect > $(DBUS_HOST_INTROSPECT)
 
-HOST_DBUS_POST_INSTALL_HOOKS += HOST_DBUS_GEN_INTROSPECT
+# HOST_DBUS_POST_INSTALL_HOOKS += HOST_DBUS_GEN_INTROSPECT
+
+define DBUS_INSTALL_TARGET_CMDS
+	$(info DBUS_INSTALL_TARGET_CMDS)
+endef
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))

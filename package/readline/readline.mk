@@ -22,10 +22,14 @@ else
 READLINE_CONF_OPTS += --disable-bracketed-paste-default
 endif
 
-define READLINE_INSTALL_INPUTRC
-	$(INSTALL) -D -m 644 package/readline/inputrc $(TARGET_DIR)/etc/inputrc
+# define READLINE_INSTALL_INPUTRC
+# 	$(INSTALL) -D -m 644 package/readline/inputrc $(TARGET_DIR)/etc/inputrc
+# endef
+# READLINE_POST_INSTALL_TARGET_HOOKS += READLINE_INSTALL_INPUTRC
+
+define READLINE_INSTALL_TARGET_CMDS
+	$(info READLINE_INSTALL_TARGET_CMDS)
 endef
-READLINE_POST_INSTALL_TARGET_HOOKS += READLINE_INSTALL_INPUTRC
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))

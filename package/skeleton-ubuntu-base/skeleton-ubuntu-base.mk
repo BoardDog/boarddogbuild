@@ -16,17 +16,17 @@ SKELETON_UBUNTU_BASE_DEPENDENCIES = skeleton-init-common
 
 SKELETON_UBUNTU_BASE_PROVIDES = skeleton
 
-# define SKELETON_UBUNTU_BASE_EXTRACT_CMDS
-# 	$(if $(SKELETON_UBUNTU_BASE_SOURCE), \
-# 		mkdir -p $(@D)/rootfs/ && \
-# 		$(TAR) -xzf $(SKELETON_UBUNTU_BASE_DL_DIR)/$(SKELETON_UBUNTU_BASE_SOURCE) -C $(@D)/rootfs/ \
-# 	)
-# endef
+define SKELETON_UBUNTU_BASE_EXTRACT_CMDS
+	$(if $(SKELETON_UBUNTU_BASE_SOURCE), \
+		mkdir -p $(@D)/rootfs/ && \
+		$(TAR) -xzf $(SKELETON_UBUNTU_BASE_DL_DIR)/$(SKELETON_UBUNTU_BASE_SOURCE) -C $(@D)/rootfs/ \
+	)
+endef
 
-# define SKELETON_UBUNTU_BASE_INSTALL_TARGET_CMDS
-# 	$(call SYSTEM_RSYNC,$(@D)/rootfs/,$(TARGET_DIR))
-# 	$(INSTALL) -m 0644 support/misc/target-dir-warning.txt $(TARGET_DIR_WARNING_FILE)
-# endef
+define SKELETON_UBUNTU_BASE_INSTALL_TARGET_CMDS
+	$(call SYSTEM_RSYNC,$(@D)/rootfs/,$(TARGET_DIR))
+	$(INSTALL) -m 0644 support/misc/target-dir-warning.txt $(TARGET_DIR_WARNING_FILE)
+endef
 
 SKELETON_UBUNTU_BASE_HOSTNAME = $(call qstrip,$(BR2_TARGET_GENERIC_HOSTNAME))
 SKELETON_UBUNTU_BASE_ISSUE = $(call qstrip,$(BR2_TARGET_GENERIC_ISSUE))

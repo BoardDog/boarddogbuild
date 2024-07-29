@@ -69,11 +69,11 @@ KMOD_LICENSE += , GPL-2.0+ (tools)
 KMOD_LICENSE_FILES += COPYING
 
 # /sbin is really /usr/sbin with merged /usr, so adjust relative symlink
-ifeq ($(BR2_ROOTFS_MERGED_USR),y)
-KMOD_BIN_PATH = ../bin/kmod
-else
-KMOD_BIN_PATH = ../usr/bin/kmod
-endif
+# ifeq ($(BR2_ROOTFS_MERGED_USR),y)
+# KMOD_BIN_PATH = ../bin/kmod
+# else
+# KMOD_BIN_PATH = ../usr/bin/kmod
+# endif
 
 # define KMOD_INSTALL_TOOLS
 # 	for i in depmod insmod lsmod modinfo modprobe rmmod; do \
@@ -116,8 +116,8 @@ endif
 
 # HOST_KMOD_POST_INSTALL_HOOKS += HOST_KMOD_INSTALL_TOOLS
 
-define HOST_KMOD_POST_INSTALL_TARGET_CMDS
-	$(info HOST_KMOD_POST_INSTALL_TARGET_CMDS)
+define KMOD_INSTALL_TARGET_CMDS
+	$(info KMOD_INSTALL_TARGET_CMDS)
 endef
 
 $(eval $(autotools-package))
