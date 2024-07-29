@@ -69,19 +69,19 @@ KMOD_LICENSE += , GPL-2.0+ (tools)
 KMOD_LICENSE_FILES += COPYING
 
 # /sbin is really /usr/sbin with merged /usr, so adjust relative symlink
-# ifeq ($(BR2_ROOTFS_MERGED_USR),y)
-# KMOD_BIN_PATH = ../bin/kmod
-# else
-# KMOD_BIN_PATH = ../usr/bin/kmod
-# endif
+ifeq ($(BR2_ROOTFS_MERGED_USR),y)
+KMOD_BIN_PATH = ../bin/kmod
+else
+KMOD_BIN_PATH = ../usr/bin/kmod
+endif
 
-# define KMOD_INSTALL_TOOLS
-# 	for i in depmod insmod lsmod modinfo modprobe rmmod; do \
-# 		ln -sf $(KMOD_BIN_PATH) $(TARGET_DIR)/sbin/$$i; \
-# 	done
-# endef
+define KMOD_INSTALL_TOOLS
+	for i in depmod insmod lsmod modinfo modprobe rmmod; do \
+		ln -sf $(KMOD_BIN_PATH) $(TARGET_DIR)/sbin/$$i; \
+	done
+endef
 
-# KMOD_POST_INSTALL_TARGET_HOOKS += KMOD_INSTALL_TOOLS
+KMOD_POST_INSTALL_TARGET_HOOKS += KMOD_INSTALL_TOOLS
 else
 KMOD_CONF_OPTS += --disable-tools
 endif
@@ -107,18 +107,14 @@ else
 HOST_KMOD_CONF_OPTS += --without-xz
 endif
 
-# # We only install depmod, since that's the only tool used for the
-# # host.
-# define HOST_KMOD_INSTALL_TOOLS
-# 	mkdir -p $(HOST_DIR)/sbin/
-# 	ln -sf ../bin/kmod $(HOST_DIR)/sbin/depmod
-# endef
-
-# HOST_KMOD_POST_INSTALL_HOOKS += HOST_KMOD_INSTALL_TOOLS
-
-define KMOD_INSTALL_TARGET_CMDS
-	$(info KMOD_INSTALL_TARGET_CMDS)
+# We only install depmod, since that's the only tool used for the
+# host.
+define HOST_KMOD_INSTALL_TOOLS
+	mkdir -p $(HOST_DIR)/sbin/
+	ln -sf ../bin/kmod $(HOST_DIR)/sbin/depmod
 endef
+
+HOST_KMOD_POST_INSTALL_HOOKS += HOST_KMOD_INSTALL_TOOLS
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))
