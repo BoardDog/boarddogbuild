@@ -1,0 +1,89 @@
+#!/bin/bash
+
+# mount chroot path
+# $1: target path
+mount_chroot() {
+    local target=$1
+    [ -z "$target" ] && {
+        echo "mount_chroot <target>"
+        return -1
+    }
+    grep -q $target/proc /proc/mounts && return
+    mount -t proc chproc $target/proc
+    mount -t sysfs chsys $target/sys
+    mount -t devtmpfs chdev $target/dev || mount --bind /dev $target/dev
+    mount -t devpts chpts $target/dev/pts
+    mount -t tmpfs chrun $target/run
+    mkdir -p $target/run/lock
+    return 0
+}
+
+# unmount chroot
+unmount_chroot() {
+    [ "$1" = "-v" -o "$1" = "-vv" ] && verbose_=$1 && shift
+    [ "$verbose_" ] && echo "unmount_chroot $@" >&2
+    # simple deep unmount must works at most of cases ;-)
+    for t in "$@"; do
+        [ -d "$t" ] || continue
+        t_=$(realpath "$t")
+        max_=10
+        while [ $max_ -gt 0 ]; do
+            mounted_=$(egrep -o "\s+$t_\S*" /proc/mounts 2>/dev/null | sort -r | uniq || true)
+            [ ${#mounted_} = 0 ] && break
+            [ "$verbose_" = "-vv" ] && echo "umount($max_) " $mounted_ >&2
+            msg_=$($sudo umount -v -R $mounted_ 2>&1 || echo ERROR)
+            max_=$((max_ - 1))
+        done
+        [ $max_ = 0 ] && {
+            echo "umount_deep $@ - $msg_"
+            return -1
+        }
+    done
+    return 0
+}
+
+# execute command in chroot
+# $1: target path
+# $2: command name
+execute_cmd_chroot() {
+    local target=$1
+    echo $@
+    local cmd=$(echo $@ | sed "s/$1 //g")
+    [ "$cmd" ] || return 1
+    echo "execute_cmd_chroot $cmd"
+    mount_chroot "$target"
+    LC_ALL=C LANG=C chroot $target /bin/bash -c "$cmd"
+    unmount_chroot "$target"
+    return 0
+}
+
+# $1: target path
+# $2: package path
+install_deb_chroot() {
+    local target=$1
+    local package=$2
+    local name=$(basename $package)
+    [ ! -d "$target/packages/" ] && mkdir -p "$target/packages/"
+    cp -f $package $target/packages/$name
+    mount_chroot "$target"
+    chroot $target /bin/bash -c "dpkg -i /packages/$name" || exit 1
+    unmount_chroot "$target"
+    rm -f $target/packages/$name
+    return 0
+}
+
+param1=$1
+case $param1 in
+execute_cmd)
+    echo "@=$@"
+    params=$(echo $@ | sed "s/execute_cmd //g")
+    echo "params=$params"
+    execute_cmd_chroot $params
+    exit $?
+    ;;
+install_deb)
+    params=$(echo $@ | sed "s/install_deb //g")
+    install_deb_chroot $params
+    exit $?
+    ;;
+esac

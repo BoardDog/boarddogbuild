@@ -1,0 +1,17 @@
+#!/bin/bash
+
+arch=$1
+
+target=$2
+
+case $arch in
+armhf)
+    cp -f /usr/bin/qemu-armhf-static $target/usr/bin
+    ;;
+arm64)
+    cp -f /usr/bin/qemu-aarch64-static $target/usr/bin
+    ;;
+amd64)
+    cp -f /usr/bin/qemu-amd64-static $target/usr/bin
+    ;;
+esac

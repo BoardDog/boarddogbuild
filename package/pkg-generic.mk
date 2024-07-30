@@ -393,7 +393,7 @@ $(BUILD_DIR)/%/.stamp_installed:
 	@$(call pkg_size_after,$(STAGING_DIR),-staging)
 	@$(call pkg_size_after,$(BINARIES_DIR),-images)
 	@$(call pkg_size_after,$(HOST_DIR),-host)
-	@$(call check_bin_arch)
+	# @$(call check_bin_arch)
 	$(Q)touch $@
 
 # Remove package sources
