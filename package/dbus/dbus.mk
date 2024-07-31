@@ -14,9 +14,9 @@ DBUS_LICENSE_FILES = COPYING
 DBUS_CPE_ID_VENDOR = freedesktop
 DBUS_INSTALL_STAGING = YES
 
-define DBUS_PERMISSIONS
-	/usr/libexec/dbus-daemon-launch-helper f 4750 0 dbus - - - - -
-endef
+# define DBUS_PERMISSIONS
+# 	/usr/libexec/dbus-daemon-launch-helper f 4750 0 dbus - - - - -
+# endef
 
 define DBUS_USERS
 	dbus -1 dbus -1 * /run/dbus - dbus DBus messagebus user

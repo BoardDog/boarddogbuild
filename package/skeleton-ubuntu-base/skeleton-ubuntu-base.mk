@@ -25,6 +25,8 @@ endef
 
 define SKELETON_UBUNTU_BASE_INSTALL_TARGET_CMDS
 	$(call SYSTEM_RSYNC,$(@D)/rootfs/,$(TARGET_DIR))
+	support/ubuntu/cpqemu $(SKELETON_UBUNTU_BASE_ARCH) $(TARGET_DIR)
+	chmod 777 $(TARGET_DIR)/tmp/
 	$(INSTALL) -m 0644 support/misc/target-dir-warning.txt $(TARGET_DIR_WARNING_FILE)
 endef
 

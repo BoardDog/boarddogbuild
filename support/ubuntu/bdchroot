@@ -1,6 +1,5 @@
 #!/bin/bash
 
-BD_FAKEROOT=output/host/bin/fakeroot
 
 # mount chroot path
 # $1: target path
@@ -49,11 +48,10 @@ unmount_chroot() {
 # $2: command name
 execute_cmd_chroot() {
     local target=$1
-    local cmd=$(echo $@ | awk -F ' ' '{for(i=1;i<NF;i++)$i=$(i+1);NF=2}1')
+    local cmd=$(echo $@ | awk -F ' ' '{$1=""; print $0}')
     [ "$cmd" ] || return 1
-    echo "execute_cmd_chroot $cmd"
     mount_chroot "$target"
-    LC_ALL=C LANG=C schroot $target /bin/bash -c "$cmd"
+    LC_ALL=C LANG=C chroot $target /bin/bash -c "$cmd"
     unmount_chroot "$target"
     return 0
 }
@@ -84,5 +82,13 @@ install_deb)
     params=$(echo $@ | sed "s/install_deb //g")
     install_deb_chroot $params
     exit $?
+    ;;
+mount_root)
+    params=$(echo $@ | sed "s/mount_root //g")
+    mount_chroot $params
+    ;;
+unmount_root)
+    params=$(echo $@ | sed "s/unmount_root //g")
+    unmount_chroot $params
     ;;
 esac
